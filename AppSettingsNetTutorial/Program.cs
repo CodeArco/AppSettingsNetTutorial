@@ -1,7 +1,9 @@
 ﻿
 
 using AppSettingsNetTutorial;
+using AppSettingsNetTutorial.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 internal class Program
 {
@@ -19,7 +21,17 @@ internal class Program
         build.Bind(config2);
 
         // Output
-        Console.WriteLine($"config1: {config1?.ExampleObjectList.FirstOrDefault()?.Header.Description}");
-        Console.WriteLine($"config2: {config2.ExampleObjectList.FirstOrDefault()?.Header.Description}");
+        Console.WriteLine($"config1 from Program: {config1?.ExampleObjectList.FirstOrDefault()?.Header.Description}");
+        Console.WriteLine($"config2 from Program: {config2.ExampleObjectList.FirstOrDefault()?.Header.Description}");
+
+        // Send config with dependency injection
+        var services = new ServiceCollection();
+        services.AddSingleton<Config>(config1);
+        services.AddSingleton<IServiceDatabase, ServiceDatabase> ();
+
+        // Call service
+        var serviceProvider = services.BuildServiceProvider();
+        var serviceDatabase = serviceProvider.GetService<IServiceDatabase>();
+        serviceDatabase.SaveData("Sample Data");
     }
 }
